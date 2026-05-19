@@ -80,7 +80,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'smarttravel',
         'USER': 'postgres',
-        'PASSWORD': 'admin321',
+        'PASSWORD': 'admin321',#burayada postgresql şifresi girilmesi gerek
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
