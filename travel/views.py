@@ -172,7 +172,7 @@ def password_reset_check(request):
 
 
 #buraya google ai studiodan alınan api key girilmeli
-client = genai.Client(api_key="AIzaSyDEkeqG2ftDJ9-r2LljUEwpNcEWPfGhcKE")
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @csrf_exempt 
 def chatbot_api(request):
