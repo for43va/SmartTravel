@@ -171,7 +171,7 @@ def password_reset_check(request):
 
 
 
-client = genai.Client(api_key="AIzaSyAJGN_uzvycRXDZdM3VqivSIPF35et_7pI") 
+client = api_key = os.environ.get("GEMINI_API_KEY")
 
 @csrf_exempt 
 def chatbot_api(request):
