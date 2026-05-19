@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* --- ANİMASYONLAR --- */
+    
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(30px); }
         to { opacity: 1; transform: translateY(0); }
@@ -15,7 +15,7 @@
         to { background-position: 100% 50%; }
     }
 
-    /* --- GENEL YAPI --- */
+    
     .login-container {
         min-height: 85vh;
         display: flex;
@@ -32,7 +32,7 @@
         background-color: var(--card-bg) !important; /* Karanlık mod uyumu */
     }
     
-    /* Sağ Taraftaki Hareketli Görsel */
+    
     .login-image {
         background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
         background-size: cover;
@@ -48,7 +48,7 @@
         background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
     }
     
-    /* --- MODERN FORM STİLLERİ --- */
+   
     .modern-form p {
         display: flex;
         flex-direction: column;
@@ -58,11 +58,11 @@
     .modern-form label {
         font-weight: 600;
         margin-bottom: 0.5rem;
-        color: var(--text-color); /* Karanlık mod uyumu */
+        color: var(--text-color); 
         font-size: 0.95rem;
     }
     
-    /* Sadece metin, şifre ve email girişlerini etkilemesi için güncellendi */
+    
     .modern-form input[type="text"],
     .modern-form input[type="password"],
     .modern-form input[type="email"] {
@@ -88,7 +88,7 @@
         color: var(--text-color);
     }
 
-    /* Beni Hatırla kutusunun boyutunu sabitliyoruz */
+    
     .modern-check .form-check-input {
         width: 1.2em !important;
         height: 1.2em !important;
@@ -96,7 +96,7 @@
         border: 2px solid #0d6efd;
     }
 
-    /* --- BUTONLAR --- */
+    
     .btn-login-blue {
         background-color: #0d6efd;
         border: none;
@@ -118,7 +118,7 @@
     <div class="card login-card w-100">
         <div class="row g-0">
             
-            <!-- Sol Taraf: Giriş Formu -->
+            
             <div class="col-md-7 p-4 p-md-5 d-flex flex-column justify-content-center" style="background-color: var(--card-bg);">
                 
                 <div class="text-center mb-5 stagger-1">
@@ -133,7 +133,7 @@
                         {{ form.as_p }}
                         
                         <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
-                            <!-- Kutucuk ve yazının yan yana durması için d-flex eklendi -->
+                            
                             <div class="form-check modern-check d-flex align-items-center mb-0">
                                 <input class="form-check-input shadow-none me-2 mt-0" type="checkbox" id="rememberMe" name="remember_me">
                                 <label class="form-check-label small mb-0" for="rememberMe">
@@ -161,7 +161,7 @@
                 
             </div>
 
-            <!-- Sağ Taraf: Hareketli Görsel -->
+            
             <div class="col-md-5 d-none d-md-block login-image">
                 <div class="position-absolute bottom-0 start-0 p-4 text-white" style="z-index: 2;">
                     <h4 class="fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hayalinizdeki Tatil</h4>
@@ -173,7 +173,7 @@
     </div>
 </div>
 
-<!-- Şifremi Unuttum Modalı -->
+
 <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="background-color: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);">
@@ -217,10 +217,10 @@ function handlePasswordReset() {
     messageDiv.classList.add('text-info');
     messageDiv.innerHTML = "Bilgileriniz kontrol ediliyor...";
 
-    // Django tarafına istek simülasyonu
+    
     setTimeout(() => {
-        // Burada gerçek bir fetch isteği yapabilirsin. 
-        // Şimdilik görsel olarak çalıştığını görmek için:
+        
+        
         messageDiv.classList.replace('text-info', 'text-success');
         messageDiv.innerHTML = "Bilgiler eşleşti! Şifre sıfırlama maili gönderildi.";
     }, 1500);

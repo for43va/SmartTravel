@@ -33,7 +33,7 @@
                 </div>
             {% endif %}
             
-            <!-- GÜNCELLENEN RESİM ALANI -->
+            
             <div class="rounded-4 overflow-hidden shadow-lg mb-4 border-0" style="max-height: 450px;">
                 <img src="{% if 'Luis' in otel.name %}{% static 'images/Luis_Otel.avif' %}
                           {% elif 'Sky' in otel.name %}{% static 'images/Sky_hill.avif' %}
@@ -73,8 +73,7 @@
     </div>
 </div>
 
-<!-- MODALLAR (Rezervasyon, Uyarı, Çakışma) -->
-<!-- ... (Gönderdiğin modal kodları aynen burada kalacak) ... -->
+
 <div id="rezervasyonModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1050; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
     <div class="card p-4 shadow-lg border-0" style="width: 90%; max-width: 500px; position: relative; border-radius: 20px; background-color: var(--card-bg);">
         <span id="btn-popup-kapat" class="text-muted" style="position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 28px; line-height: 1;">&times;</span>
@@ -113,7 +112,7 @@
     </div>
 </div>
 
-<!-- Diğer modal ve script bölümleri gönderdiğin haliyle devam ediyor... -->
+
 <div id="uyariModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1051; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
     <div class="card p-5 text-center shadow-lg border-0" style="width: 90%; max-width: 450px; border-radius: 15px; background-color: var(--card-bg);">
         <div class="mb-4 text-warning"><i class="fas fa-user-lock fa-3x"></i></div>
@@ -153,7 +152,7 @@
             else uyariModal.style.display = "flex";
         }
 
-        // Form Gönderimi ve AJAX Kontrolü
+        
         rezForm.onsubmit = function(e) {
             e.preventDefault();
 
@@ -176,7 +175,7 @@
             });
         }
 
-        // Kapatma İşlemleri
+        
         document.getElementById("btn-popup-kapat").onclick = () => rezModal.style.display = "none";
         
         window.onclick = function(event) {

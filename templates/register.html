@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* Sayfayı ortalamak ve arka planı ayarlamak için */
+    
     .register-container {
         min-height: 85vh;
         display: flex;
@@ -12,7 +12,7 @@
         justify-content: center;
     }
     
-    /* Ana Kart Tasarımı */
+    
     .register-card {
         border-radius: 1.5rem;
         overflow: hidden;
@@ -21,19 +21,19 @@
         max-width: 1000px;
     }
     
-    /* Sol Taraftaki Seyahat Görseli */
+    
     .register-image {
-        /* Unsplash'ten rastgele kaliteli bir seyahat fotoğrafı çekiyoruz */
+        
         background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
         background-size: cover;
         background-position: center;
         min-height: 500px;
     }
     
-    /* Django Formunu Modernleştirme (Sihir burada) */
+    
     .modern-form p {
         display: flex;
-        flex-direction: column; /* Label'ı üste, Input'u alta alır */
+        flex-direction: column; 
         margin-bottom: 1.2rem;
     }
     
@@ -81,12 +81,12 @@
     <div class="card register-card w-100">
         <div class="row g-0">
             
-            <!-- Sol Taraf: İlham Verici Görsel (Sadece büyük ekranlarda görünür) -->
+            
             <div class="col-md-5 d-none d-md-block register-image">
-                <!-- Görsel CSS'ten geliyor -->
+                
             </div>
             
-            <!-- Sağ Taraf: Kayıt Formu -->
+            
             <div class="col-md-7 p-4 p-md-5 bg-white">
                 <div class="text-center mb-4">
                     <h2 class="fw-bold text-dark">Aramıza Katılın ✈️</h2>
@@ -96,13 +96,13 @@
                 <form method="POST" class="modern-form">
                     {% csrf_token %}
                     
-                    <!-- Manuel E-posta Alanımız -->
+                    
                     <p>
                         <label for="id_email">E-posta Adresi:</label>
                         <input type="email" name="email" id="id_email" placeholder="ornek@mail.com" required>
                     </p>
                     
-                    <!-- Django'nun Kullanıcı Adı ve Şifre Alanları -->
+                    
                     {{ form.as_p }}
                     
                     <div class="d-grid mt-4">

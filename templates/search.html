@@ -5,9 +5,9 @@
 
 {% block content %}
 <style>
-    /* --- FİLTRELEME PANELİ STİLLERİ --- */
+    
     .filter-sidebar {
-        background-color: var(--card-bg); /* Karanlık mod uyumu */
+        background-color: var(--card-bg); 
         border-radius: 1.2rem;
         padding: 25px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06);
@@ -26,7 +26,7 @@
         align-items: center;
     }
 
-    /* --- OTEL KARTI STİLLERİ --- */
+    
     .hotel-card {
         border: none;
         border-radius: 1.2rem;
@@ -36,7 +36,7 @@
         height: 100%;
         display: flex;
         flex-direction: column;
-        background-color: var(--card-bg); /* Karanlık mod uyumu */
+        background-color: var(--card-bg); 
     }
 
     .hotel-card:hover {
@@ -82,7 +82,7 @@
 <div class="container py-5 mt-4">
     <div class="row g-4">
         
-        <!-- SOL TARAF: FİLTRELEME PANELİ -->
+        
         <div class="col-lg-3 col-md-4">
             <div class="filter-sidebar">
                 <form action="{% url 'arama' %}" method="GET">
@@ -121,7 +121,7 @@
             </div>
         </div>
 
-        <!-- SAĞ TARAF: SONUÇLAR -->
+        
         <div class="col-lg-9 col-md-8">
             {% if oteller and aranan_sehir|length < 4 and aranan_sehir != "" %}
             <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4">
@@ -153,7 +153,7 @@
                 <div class="col-xl-4 col-lg-6">
                     <div class="card hotel-card">
                         <div class="hotel-img-container">
-                            <!-- OTEL RESİM ENTEGRASYONU -->
+                            
                             <img src="{% if 'Luis' in otel.name %}{% static 'images/Luis_Otel.avif' %}
                                       {% elif 'Sky' in otel.name %}{% static 'images/Sky_hill.avif' %}
                                       {% elif 'Anatolian' in otel.name or 'Anatolia' in otel.name %}{% static 'images/anatolian.jpg' %}
