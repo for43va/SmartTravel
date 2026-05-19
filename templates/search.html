@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Arama Sonuçları | SmartTravel{% endblock %}
+
+{% block content %}
+<style>
+    /* --- FİLTRELEME PANELİ STİLLERİ --- */
+    .filter-sidebar {
+        background-color: var(--card-bg); /* Karanlık mod uyumu */
+        border-radius: 1.2rem;
+        padding: 25px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        position: sticky;
+        top: 100px;
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .filter-section-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 1.2rem;
+        color: var(--text-color);
+        display: flex;
+        align-items: center;
+    }
+
+    /* --- OTEL KARTI STİLLERİ --- */
+    .hotel-card {
+        border: none;
+        border-radius: 1.2rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background-color: var(--card-bg); /* Karanlık mod uyumu */
+    }
+
+    .hotel-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 30px rgba(13, 110, 253, 0.12);
+    }
+
+    .hotel-img-container {
+        height: 220px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hotel-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .hotel-card:hover .hotel-img {
+        transform: scale(1.1);
+    }
+
+    .price-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(13, 110, 253, 0.95);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        backdrop-filter: blur(4px);
+        z-index: 2;
+    }
+
+    .card-title { color: var(--text-color); }
+    .text-muted-custom { color: var(--text-muted); }
+</style>
+
+<div class="container py-5 mt-4">
+    <div class="row g-4">
+        
+        <!-- SOL TARAF: FİLTRELEME PANELİ -->
+        <div class="col-lg-3 col-md-4">
+            <div class="filter-sidebar">
+                <form action="{% url 'arama' %}" method="GET">
+                    <input type="hidden" name="q" value="{{ aranan_sehir }}">
+
+                    <div class="filter-section-title text-primary">
+                        <i class="fas fa-sliders-h me-2"></i> Filtrele
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted-custom">Maksimum Fiyat</label>
+                        <input type="range" class="form-range" min="500" max="15000" step="500" name="price_max" id="priceRange" value="{{ request.GET.price_max|default:'15000' }}">
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>500₺</span>
+                            <span id="priceValue" class="text-primary fw-bold">{{ request.GET.price_max|default:'15.000' }}₺</span>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" style="border-color: var(--border-color);">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted-custom text-uppercase mb-3">Yıldız Sayısı</label>
+                        {% for star in "543"|make_list %}
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="star" value="{{ star }}" id="star{{ star }}" {% if star in request.GET.getlist.star %}checked{% endif %}>
+                            <label class="form-check-label small" for="star{{ star }}">
+                                {% if star == "5" %}⭐⭐⭐⭐⭐{% elif star == "4" %}⭐⭐⭐⭐{% else %}⭐⭐⭐{% endif %} {{ star }} Yıldız
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold py-2 shadow-sm mb-2 text-white">Uygula</button>
+                    <a href="{% url 'arama' %}?q={{ aranan_sehir }}" class="btn btn-light btn-sm w-100 rounded-pill text-muted text-decoration-none text-center d-block">Sıfırla</a>
+                </form>
+            </div>
+        </div>
+
+        <!-- SAĞ TARAF: SONUÇLAR -->
+        <div class="col-lg-9 col-md-8">
+            {% if oteller and aranan_sehir|length < 4 and aranan_sehir != "" %}
+            <div class="alert alert-info rounded-4 border-0 shadow-sm mb-4">
+                <i class="fas fa-lightbulb me-2"></i> 
+                <strong>"{{ aranan_sehir }}"</strong> yazdınız. Şunu mu demek istediniz: 
+                {% for otel in oteller|dictsort:"city" %}
+                    {% ifchanged %}
+                        <a href="?q={{ otel.city }}" class="badge bg-primary text-decoration-none me-1">{{ otel.city }}</a>
+                    {% endifchanged %}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4 shadow-sm border" style="background-color: var(--card-bg); border-color: var(--border-color) !important;">
+                <h4 class="fw-bold mb-0" style="font-size: 1.25rem; color: var(--text-color);">
+                    {% if aranan_sehir %}
+                        <span class="text-primary">"{{ aranan_sehir }}"</span> Sonuçları
+                    {% else %}
+                        Tüm Oteller
+                    {% endif %}
+                </h4>
+                <div class="text-muted small">
+                    <strong class="text-primary">{{ oteller|length }}</strong> tesis bulundu
+                </div>
+            </div>
+
+            <div class="row g-4">
+                {% for otel in oteller %}
+                <div class="col-xl-4 col-lg-6">
+                    <div class="card hotel-card">
+                        <div class="hotel-img-container">
+                            <!-- OTEL RESİM ENTEGRASYONU -->
+                            <img src="{% if 'Luis' in otel.name %}{% static 'images/Luis_Otel.avif' %}
+                                      {% elif 'Sky' in otel.name %}{% static 'images/Sky_hill.avif' %}
+                                      {% elif 'Anatolian' in otel.name or 'Anatolia' in otel.name %}{% static 'images/anatolian.jpg' %}
+                                      {% elif 'Delita' in otel.name %}{% static 'images/delita_city.jpg' %}
+                                      {% elif 'Long' in otel.name %}{% static 'images/long_beach.jpg' %}
+                                      {% else %}https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80{% endif %}" 
+                                 class="hotel-img" alt="{{ otel.name }}">
+                            
+                            <div class="price-badge fw-bold">₺{{ otel.price }}</div>
+                        </div>
+                        <div class="card-body p-4 d-flex flex-column">
+                            <h5 class="card-title fw-bold mb-1">{{ otel.name }}</h5>
+                            <p class="small text-muted-custom mb-3"><i class="fas fa-map-marker-alt text-primary me-1"></i>{{ otel.district }}, {{ otel.city }}</p>
+                            
+                            <div class="mt-auto d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--border-color) !important;">
+                                <div class="text-warning small fw-bold">
+                                    <i class="fas fa-star"></i> {{ otel.star_rating }} 
+                                    <span class="text-muted fw-normal">({{ otel.review_count }})</span>
+                                </div>
+                                <a href="{% url 'otel_detay' otel.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Görüntüle</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search-location fa-4x text-light mb-3"></i>
+                    <h3 class="fw-bold" style="color: var(--text-color);">Sonuç Bulunamadı</h3>
+                    <p class="text-muted">Aradığınız kriterlere uygun bir otel mevcut değil. Filtreleri temizlemeyi deneyin.</p>
+                    <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4 mt-2 text-white">Yeni Arama</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const priceRange = document.getElementById('priceRange');
+    const priceValue = document.getElementById('priceValue');
+    priceRange.oninput = function() {
+        priceValue.innerHTML = this.value + '₺';
+    }
+</script>
+
+{% endblock %}

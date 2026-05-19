@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}Kayıt Ol | SmartTravel{% endblock %}
+
+{% block content %}
+<style>
+    /* Sayfayı ortalamak ve arka planı ayarlamak için */
+    .register-container {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Ana Kart Tasarımı */
+    .register-card {
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        border: none;
+        max-width: 1000px;
+    }
+    
+    /* Sol Taraftaki Seyahat Görseli */
+    .register-image {
+        /* Unsplash'ten rastgele kaliteli bir seyahat fotoğrafı çekiyoruz */
+        background-image: url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+        background-size: cover;
+        background-position: center;
+        min-height: 500px;
+    }
+    
+    /* Django Formunu Modernleştirme (Sihir burada) */
+    .modern-form p {
+        display: flex;
+        flex-direction: column; /* Label'ı üste, Input'u alta alır */
+        margin-bottom: 1.2rem;
+    }
+    
+    .modern-form label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+    
+    .modern-form input {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        color: #212529;
+        background-color: #f8f9fa;
+        border: 1.5px solid #e9ecef;
+        border-radius: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .modern-form input:focus {
+        background-color: #fff;
+        border-color: #0d6efd;
+        outline: none;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+    }
+    
+    .modern-form ul.errorlist {
+        color: #dc3545;
+        padding-left: 0;
+        list-style: none;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+    
+    .modern-form .helptext {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.4rem;
+    }
+</style>
+
+<div class="container register-container py-4">
+    <div class="card register-card w-100">
+        <div class="row g-0">
+            
+            <!-- Sol Taraf: İlham Verici Görsel (Sadece büyük ekranlarda görünür) -->
+            <div class="col-md-5 d-none d-md-block register-image">
+                <!-- Görsel CSS'ten geliyor -->
+            </div>
+            
+            <!-- Sağ Taraf: Kayıt Formu -->
+            <div class="col-md-7 p-4 p-md-5 bg-white">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold text-dark">Aramıza Katılın ✈️</h2>
+                    <p class="text-muted">SmartTravel ile dünyayı keşfetmeye hemen başlayın.</p>
+                </div>
+                
+                <form method="POST" class="modern-form">
+                    {% csrf_token %}
+                    
+                    <!-- Manuel E-posta Alanımız -->
+                    <p>
+                        <label for="id_email">E-posta Adresi:</label>
+                        <input type="email" name="email" id="id_email" placeholder="ornek@mail.com" required>
+                    </p>
+                    
+                    <!-- Django'nun Kullanıcı Adı ve Şifre Alanları -->
+                    {{ form.as_p }}
+                    
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm py-3">
+                            Ücretsiz Kayıt Ol
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4 pt-3 border-top">
+                    <p class="text-muted small mb-0">Zaten hesabınız var mı? 
+                        <a href="/login" class="text-primary fw-bold text-decoration-none">Giriş Yap</a>
+                    </p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

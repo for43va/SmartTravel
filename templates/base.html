@@ -1,0 +1,300 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SmartTravel{% endblock %}</title>
+
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+    
+    :root {
+        --bg-color: #f8f9fa;
+        --text-color: #333333;
+        --navbar-bg: #ffffff;
+        --border-color: #e1e1e1;
+        --card-bg: #ffffff;
+    }
+
+    body.dark-mode {
+        --bg-color: #121212;
+        --text-color: #e0e0e0;
+        --navbar-bg: #1a1a1a;
+        --border-color: #2d2d2d;
+        --card-bg: #1e1e1e;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    
+    .custom-navbar {
+        background-color: var(--navbar-bg) !important;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+    }
+
+    .nav-link {
+        color: var(--text-color) !important;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        color: #0d6efd !important;
+    }
+
+    .navbar-brand img {
+        height: 55px;
+        transition: transform 0.3s ease;
+    }
+
+    
+    .modal-content, .card {
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+    }
+
+    
+    #chat-messages table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 12px;
+        background-color: var(--card-bg);
+    }
+    #chat-messages th, #chat-messages td {
+        border: 1px solid var(--border-color);
+        padding: 6px;
+        text-align: left;
+    }
+    #chat-messages th {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    
+    .bot-response-content {
+        overflow-x: auto;
+        word-wrap: break-word;
+        max-width: 100%;
+    }
+
+    .theme-toggle-btn {
+        color: var(--text-color);
+        border: none;
+        background: none;
+        padding: 8px;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg custom-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img src="{% static 'images/logo.png' %}" alt="SmartTravel Logo">
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            Hoş geldin, {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                            <li><a class="dropdown-item" href="{% url 'rezervasyonlarim' %}">📅 Rezervasyonlarım</a></li>
+                            <li><a class="dropdown-item" href="/admin">⚙️ Yönetim Paneli</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post" class="px-3">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-danger w-100 rounded-pill">Çıkış Yap</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Giriş Yap</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link btn-register text-white shadow-sm" href="{% url 'register' %}" style="background-color: #0d6efd; border-radius: 6px; padding: 10px 24px;">Kaydol</a>
+                    </li>
+                {% endif %}
+                
+                <li class="nav-item">
+                    <button id="themeToggle" class="theme-toggle-btn ms-2">
+                        <i class="fas fa-moon fs-5"></i>
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid p-0">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ================= MODALLAR ================= -->
+
+<div class="modal fade" id="kayitBasariliModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg">
+            <div class="modal-body text-center p-5">
+                <i class="fas fa-check-circle fa-4x text-success mb-4"></i>
+                <h3 class="fw-bold mb-3">Tebrikler!</h3>
+                <p class="opacity-75 mb-4">Hesabınız başarıyla oluşturuldu.</p>
+                <a href="{% url 'login' %}" class="btn btn-primary w-100 py-3 rounded-pill fw-bold">Şimdi Giriş Yap</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="authGerekliModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg">
+            <div class="modal-body text-center p-5">
+                <i class="fas fa-user-lock fa-4x text-warning mb-4"></i>
+                <h3 class="fw-bold mb-3">Giriş Yapmalısınız</h3>
+                <p class="opacity-75 mb-4">Rezervasyon yapabilmek için önce giriş yapınız.</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-primary py-3 rounded-pill fw-bold">Giriş Yap</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-secondary py-3 rounded-pill fw-bold">Hesap Oluştur</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="msg-bridge" data-show-modal="{% if messages %}{% for m in messages %}{% if 'success' in m.tags and 'kayıt' in m.message|lower %}true{% endif %}{% endfor %}{% else %}false{% endif %}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = themeToggle.querySelector('i');
+    const body = document.body;
+
+    if (localStorage.getItem('theme') === 'dark') {
+        body.classList.add('dark-mode');
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
+    }
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        themeIcon.classList.replace(isDark ? 'fa-moon' : 'fa-sun', isDark ? 'fa-sun' : 'fa-moon');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const bridge = document.getElementById('msg-bridge');
+        if (bridge && bridge.getAttribute('data-show-modal') === 'true') {
+            const modalEl = document.getElementById('kayitBasariliModal');
+            if (modalEl) new bootstrap.Modal(modalEl).show();
+        }
+    });
+</script>
+
+
+<div id="chatbot-container" style="position: fixed; bottom: 20px; right: 20px; width: 320px; background: var(--card-bg); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 9999; display: none; flex-direction: column;">
+    <div style="background: #0d6efd; color: white; padding: 10px; border-radius: 10px 10px 0 0; font-weight: bold; display: flex; justify-content: space-between;">
+        SmartTravel Asistan
+        <span onclick="document.getElementById('chatbot-container').style.display='none'" style="cursor: pointer;">&times;</span>
+    </div>
+    <div id="chat-messages" style="height: 350px; overflow-y: auto; padding: 10px; font-size: 14px; color: var(--text-color);">
+        <div><strong>Asistan:</strong> Merhaba! SmartTravel otelleri hakkında size nasıl yardımcı olabilirim?</div>
+    </div>
+    <div style="display: flex; border-top: 1px solid var(--border-color);">
+        <input type="text" id="chat-input" placeholder="Bir şey sorun..." style="flex: 1; border: none; padding: 10px; border-radius: 0 0 0 10px; outline: none; background: transparent; color: var(--text-color);">
+        <button onclick="mesajGonder()" style="border: none; background: #0d6efd; color: white; padding: 10px; border-radius: 0 0 10px 0; cursor: pointer;">Gönder</button>
+    </div>
+</div>
+
+<button onclick="document.getElementById('chatbot-container').style.display='flex'" style="position: fixed; bottom: 20px; right: 20px; border-radius: 50%; width: 60px; height: 60px; background: #0d6efd; color: white; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 9998; cursor: pointer;">
+    <i class="fas fa-comment-dots fa-2x"></i>
+</button>
+
+<script>
+    async function mesajGonder() {
+        const input = document.getElementById("chat-input");
+        const messagesDiv = document.getElementById("chat-messages");
+        const userMsg = input.value.trim();
+
+        if (!userMsg) return;
+
+        messagesDiv.innerHTML += `<div style="margin-top: 10px; text-align: right;"><strong>Siz:</strong> ${userMsg}</div>`;
+        input.value = "";
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        const loadingId = "loading-" + Date.now();
+        messagesDiv.innerHTML += `<div id="${loadingId}" style="margin-top: 10px; color: gray;"><em>Asistan düşünüyor...</em></div>`;
+
+        try {
+            const response = await fetch('/api/chatbot/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMsg })
+            });
+            
+            const data = await response.json();
+            document.getElementById(loadingId).remove();
+
+            
+            let reply = data.reply;
+            
+            
+            if (reply.includes('|') && !reply.includes('\n\n|')) {
+                reply = reply.replace(/([^\n])\n?\|/g, '$1\n\n|');
+            }
+
+            const renderedReply = marked.parse(reply); 
+            
+            
+            messagesDiv.innerHTML += `
+                <div style="margin-top: 10px;">
+                    <strong>Asistan:</strong><br>
+                    <div class="bot-response-content">${renderedReply}</div>
+                </div>`;
+            
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        } catch (error) {
+            if (document.getElementById(loadingId)) document.getElementById(loadingId).remove();
+            messagesDiv.innerHTML += `<div style="margin-top: 10px; color: red;"><strong>Asistan:</strong> Bir bağlantı hatası oluştu.</div>`;
+        }
+    }
+
+    document.getElementById("chat-input").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            mesajGonder();
+        }
+    });
+</script>
+
+</body>
+</html>

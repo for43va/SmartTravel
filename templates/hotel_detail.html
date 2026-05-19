@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %} <!-- Statik dosyalar için bu satırı ekledik -->
+
+{% block title %}{{ otel.name }} | SmartTravel{% endblock %}
+
+{% block content %}
+<div class="container py-5 mt-5">
+    <div class="row g-5">
+        
+        <div class="col-md-7">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Anasayfa</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'arama' %}?q={{ otel.city }}" class="text-decoration-none">{{ otel.city }} / {{ otel.district }} Otelleri</a></li>
+                    <li class="breadcrumb-item active" style="color: var(--text-color);">{{ otel.name }}</li>
+                </ol>
+            </nav>
+
+            {% if mevcut_rezervasyonlar %}
+                <div class="alert alert-info border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center p-3" role="alert">
+                    <div class="me-3 bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="min-width: 45px; height: 45px;">
+                        <i class="fas fa-calendar-check fa-lg"></i>
+                    </div>
+                    <div>
+                        <h6 class="alert-heading fw-bold mb-1">Bu otelde rezervasyonunuz var!</h6>
+                        {% for rez in mevcut_rezervasyonlar %}
+                            <p class="mb-0 small opacity-75">
+                                <strong>{{ rez.check_in|date:"d M Y" }}</strong> - <strong>{{ rez.check_out|date:"d M Y" }}</strong> tarihleri arasında konaklamanız görünüyor.
+                            </p>
+                        {% endfor %}
+                        <a href="{% url 'rezervasyonlarim' %}" class="alert-link small mt-1 d-inline-block">Tüm rezervasyonlarıma git &rarr;</a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- GÜNCELLENEN RESİM ALANI -->
+            <div class="rounded-4 overflow-hidden shadow-lg mb-4 border-0" style="max-height: 450px;">
+                <img src="{% if 'Luis' in otel.name %}{% static 'images/Luis_Otel.avif' %}
+                          {% elif 'Sky' in otel.name %}{% static 'images/Sky_hill.avif' %}
+                          {% elif 'Anatolian' in otel.name or 'Anatolia' in otel.name %}{% static 'images/anatolian.jpg' %}
+                          {% elif 'Delita' in otel.name %}{% static 'images/delita_city.jpg' %}
+                          {% elif 'Long' in otel.name %}{% static 'images/long_beach.jpg' %}
+                          {% else %}https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=1200&q=80{% endif %}" 
+                     class="img-fluid w-100" 
+                     alt="{{ otel.name }}"
+                     style="height: 100%; object-fit: cover;">
+            </div>
+            
+            <h2 class="fw-bold mb-3" style="color: var(--text-color);">Otel Hakkında</h2>
+            <p class="opacity-75 leading-relaxed" style="color: var(--text-color);">
+                {{ otel.name }}, {{ otel.city }} bölgesinin en sevilen tesislerinden biridir. 
+                Gerek mimarisi gerekse sunduğu hizmet kalitesiyle misafirlerine unutulmaz bir deneyim sunmaktadır.
+            </p>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card border-0 shadow-lg rounded-4 p-4 sticky-top" style="top: 100px; background-color: var(--card-bg); border: 1px solid var(--border-color) !important;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bold text-primary mb-0">₺{{ otel.price }} <small class="opacity-50 fs-6">/ gecelik</small></h3>
+                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">⭐ {{ otel.star_rating }}</span>
+                </div>
+
+                <button id="btn-popup-ac" class="btn btn-primary w-100 py-3 rounded-pill fw-bold mb-3 shadow text-white">
+                    Hemen Rezervasyon Yap
+                </button>
+                
+                <p class="text-center opacity-75 small mb-0" style="color: var(--text-color);">
+                    <i class="fas fa-info-circle me-1"></i> Bu otel için toplam {{ otel.review_count }} yorum yapıldı
+                </p>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- MODALLAR (Rezervasyon, Uyarı, Çakışma) -->
+<!-- ... (Gönderdiğin modal kodları aynen burada kalacak) ... -->
+<div id="rezervasyonModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1050; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+    <div class="card p-4 shadow-lg border-0" style="width: 90%; max-width: 500px; position: relative; border-radius: 20px; background-color: var(--card-bg);">
+        <span id="btn-popup-kapat" class="text-muted" style="position: absolute; top: 15px; right: 20px; cursor: pointer; font-size: 28px; line-height: 1;">&times;</span>
+        
+        <div class="text-center mb-4">
+            <h4 class="fw-bold mb-1" style="color: var(--text-color);">Rezervasyon Yap</h4>
+            <p class="text-muted small">{{ otel.name }}</p>
+        </div>
+
+        <form id="rezervasyonFormu" action="{% url 'rezervasyon_yap' otel.id %}" method="POST">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="small fw-bold mb-1" style="color: var(--text-color);">Giriş Tarihi</label>
+                    <input type="date" id="check_in" name="check_in" class="form-control rounded-3" required>
+                </div>
+                <div class="col-6">
+                    <label class="small fw-bold mb-1" style="color: var(--text-color);">Çıkış Tarihi</label>
+                    <input type="date" id="check_out" name="check_out" class="form-control rounded-3" required>
+                </div>
+                <div class="col-6">
+                    <label class="small fw-bold mb-1" style="color: var(--text-color);">Yetişkin</label>
+                    <input type="number" name="adults" min="1" value="1" class="form-control rounded-3">
+                </div>
+                <div class="col-6">
+                    <label class="small fw-bold mb-1" style="color: var(--text-color);">Çocuk</label>
+                    <input type="number" name="children" min="0" value="0" class="form-control rounded-3">
+                </div>
+                <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow text-white">
+                        Rezervasyon Yap
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Diğer modal ve script bölümleri gönderdiğin haliyle devam ediyor... -->
+<div id="uyariModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1051; justify-content: center; align-items: center; backdrop-filter: blur(3px);">
+    <div class="card p-5 text-center shadow-lg border-0" style="width: 90%; max-width: 450px; border-radius: 15px; background-color: var(--card-bg);">
+        <div class="mb-4 text-warning"><i class="fas fa-user-lock fa-3x"></i></div>
+        <h4 class="fw-bold mb-3" style="color: var(--text-color);">Giriş Yapmalısınız</h4>
+        <p class="opacity-75 mb-4" style="color: var(--text-color);">Rezervasyon yapabilmek için lütfen giriş yapınız veya kayıt olunuz.</p>
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="{% url 'login' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-bold w-50 text-white">Giriş Yap</a>
+            <a href="{% url 'register' %}" class="btn btn-outline-secondary px-4 py-2 rounded-pill fw-bold w-50">Kayıt Ol</a>
+        </div>
+    </div>
+</div>
+
+<div id="cakismaModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1100; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div class="card p-5 text-center shadow-lg border-0" style="width: 90%; max-width: 450px; border-radius: 20px; background-color: var(--card-bg);">
+        <div class="mb-4 text-danger"><i class="fas fa-calendar-times fa-4x"></i></div>
+        <h4 class="fw-bold mb-3" style="color: var(--text-color);">Rezervasyonunuz Mevcut!</h4>
+        <p class="opacity-75 mb-4" style="color: var(--text-color);">Bu tarihler arasında bu otelden zaten bir rezervasyonunuz bulunmaktadır.</p>
+        <a href="{% url 'rezervasyonlarim' %}" class="btn btn-danger w-100 py-3 rounded-pill fw-bold shadow">
+            Rezervasyonlarıma Git
+        </a>
+        <button type="button" onclick="document.getElementById('cakismaModal').style.display='none'" class="btn btn-link mt-2 text-muted text-decoration-none small">Vazgeç</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const rezModal = document.getElementById("rezervasyonModal");
+        const uyariModal = document.getElementById("uyariModal");
+        const cakismaModal = document.getElementById("cakismaModal");
+        const rezForm = document.getElementById("rezervasyonFormu");
+        
+        const isAuth = "{{ user.is_authenticated }}" === "True";
+
+        // Rezervasyon Butonuna Tıklama
+        document.getElementById("btn-popup-ac").onclick = function() {
+            if (isAuth) rezModal.style.display = "flex";
+            else uyariModal.style.display = "flex";
+        }
+
+        // Form Gönderimi ve AJAX Kontrolü
+        rezForm.onsubmit = function(e) {
+            e.preventDefault();
+
+            const checkIn = document.getElementById("check_in").value;
+            const checkOut = document.getElementById("check_out").value;
+
+            fetch(`/otel/{{ otel.id }}/kontrol/?check_in=${checkIn}&check_out=${checkOut}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    rezModal.style.display = "none";
+                    cakismaModal.style.display = "flex";
+                } else {
+                    rezForm.submit();
+                }
+            })
+            .catch(err => {
+                console.error("Kontrol sırasında hata oluştu:", err);
+                rezForm.submit(); 
+            });
+        }
+
+        // Kapatma İşlemleri
+        document.getElementById("btn-popup-kapat").onclick = () => rezModal.style.display = "none";
+        
+        window.onclick = function(event) {
+            if (event.target == rezModal) rezModal.style.display = "none";
+            if (event.target == uyariModal) uyariModal.style.display = "none";
+            if (event.target == cakismaModal) cakismaModal.style.display = "none";
+        }
+    });
+</script>
+{% endblock %}

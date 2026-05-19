@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Giriş Yap | SmartTravel{% endblock %}
+
+{% block content %}
+<style>
+    /* --- ANİMASYONLAR --- */
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes panImage {
+        from { background-position: 0% 50%; }
+        to { background-position: 100% 50%; }
+    }
+
+    /* --- GENEL YAPI --- */
+    .login-container {
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .login-card {
+        border-radius: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        border: none;
+        max-width: 1000px;
+        background-color: var(--card-bg) !important; /* Karanlık mod uyumu */
+    }
+    
+    /* Sağ Taraftaki Hareketli Görsel */
+    .login-image {
+        background-image: url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+        background-size: cover;
+        animation: panImage 40s linear infinite alternate;
+        min-height: 500px;
+        position: relative;
+    }
+
+    .login-image::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
+    }
+    
+    /* --- MODERN FORM STİLLERİ --- */
+    .modern-form p {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modern-form label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color); /* Karanlık mod uyumu */
+        font-size: 0.95rem;
+    }
+    
+    /* Sadece metin, şifre ve email girişlerini etkilemesi için güncellendi */
+    .modern-form input[type="text"],
+    .modern-form input[type="password"],
+    .modern-form input[type="email"] {
+        width: 100%;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        color: var(--text-color);
+        background-color: var(--input-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 0.75rem;
+        transition: all 0.4s ease;
+    }
+    
+    .modern-form input:focus {
+        background-color: var(--input-bg);
+        border-color: #0d6efd; 
+        outline: none;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .modern-check .form-check-label {
+        color: var(--text-color);
+    }
+
+    /* Beni Hatırla kutusunun boyutunu sabitliyoruz */
+    .modern-check .form-check-input {
+        width: 1.2em !important;
+        height: 1.2em !important;
+        cursor: pointer;
+        border: 2px solid #0d6efd;
+    }
+
+    /* --- BUTONLAR --- */
+    .btn-login-blue {
+        background-color: #0d6efd;
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-login-blue:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(13, 110, 253, 0.3);
+    }
+
+    .stagger-1 { animation: fadeInUp 0.8s ease-out forwards; opacity: 0; }
+    .stagger-2 { animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0; }
+    .stagger-3 { animation: fadeInUp 0.8s ease-out 0.4s forwards; opacity: 0; }
+</style>
+
+<div class="container login-container py-4">
+    <div class="card login-card w-100">
+        <div class="row g-0">
+            
+            <!-- Sol Taraf: Giriş Formu -->
+            <div class="col-md-7 p-4 p-md-5 d-flex flex-column justify-content-center" style="background-color: var(--card-bg);">
+                
+                <div class="text-center mb-5 stagger-1">
+                    <h2 class="fw-bold" style="color: var(--text-color);">Hoş Geldiniz 👋</h2>
+                    <p style="color: var(--text-muted);">SmartTravel ile dünyayı keşfetmeye hemen başlayın.</p>
+                </div>
+                
+                <div class="px-md-4 stagger-2">
+                    <form method="POST" class="modern-form">
+                        {% csrf_token %}
+                        
+                        {{ form.as_p }}
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                            <!-- Kutucuk ve yazının yan yana durması için d-flex eklendi -->
+                            <div class="form-check modern-check d-flex align-items-center mb-0">
+                                <input class="form-check-input shadow-none me-2 mt-0" type="checkbox" id="rememberMe" name="remember_me">
+                                <label class="form-check-label small mb-0" for="rememberMe">
+                                    Beni Hatırla
+                                </label>
+                            </div>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" class="text-primary small text-decoration-none fw-bold">
+                                Şifremi Unuttum
+                            </a>
+                        </div>
+
+                        <div class="d-grid mt-2">
+                            <button type="submit" class="btn btn-login-blue btn-lg rounded-pill fw-bold shadow-sm py-3 text-white">
+                                Giriş Yap
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="text-center mt-5 pt-3 border-top stagger-3" style="border-color: var(--border-color) !important;">
+                    <p class="small mb-0" style="color: var(--text-muted);">Henüz bir hesabınız yok mu? 
+                        <a href="/register" class="text-primary fw-bold text-decoration-none">Hemen Kaydolun</a>
+                    </p>
+                </div>
+                
+            </div>
+
+            <!-- Sağ Taraf: Hareketli Görsel -->
+            <div class="col-md-5 d-none d-md-block login-image">
+                <div class="position-absolute bottom-0 start-0 p-4 text-white" style="z-index: 2;">
+                    <h4 class="fw-bold" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hayalinizdeki Tatil</h4>
+                    <p class="small mb-0 opacity-75">Sadece birkaç tık uzağınızda.</p>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Şifremi Unuttum Modalı -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel">Şifre Sıfırlama</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="mb-3">
+                        <label for="resetUsername" class="form-label small fw-bold">Kullanıcı Adınız:</label>
+                        <input type="text" class="form-control" id="resetUsername" placeholder="Kullanıcı adınızı girin" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color);">
+                    </div>
+                    <div class="mb-3">
+                        <label for="resetEmail" class="form-label small fw-bold">Kayıtlı E-posta Adresiniz:</label>
+                        <input type="email" class="form-control" id="resetEmail" placeholder="ornek@mail.com" required style="background-color: var(--input-bg); color: var(--text-color); border-color: var(--border-color);">
+                    </div>
+                    <div id="resetMessage" class="small mt-2 d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">İptal</button>
+                <button type="button" onclick="handlePasswordReset()" class="btn btn-primary rounded-pill px-4">Bağlantı Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function handlePasswordReset() {
+    const username = document.getElementById('resetUsername').value;
+    const email = document.getElementById('resetEmail').value;
+    const messageDiv = document.getElementById('resetMessage');
+
+    if (!username || !email) {
+        alert("Lütfen tüm alanları doldurun.");
+        return;
+    }
+
+    messageDiv.classList.remove('d-none', 'text-danger', 'text-success');
+    messageDiv.classList.add('text-info');
+    messageDiv.innerHTML = "Bilgileriniz kontrol ediliyor...";
+
+    // Django tarafına istek simülasyonu
+    setTimeout(() => {
+        // Burada gerçek bir fetch isteği yapabilirsin. 
+        // Şimdilik görsel olarak çalıştığını görmek için:
+        messageDiv.classList.replace('text-info', 'text-success');
+        messageDiv.innerHTML = "Bilgiler eşleşti! Şifre sıfırlama maili gönderildi.";
+    }, 1500);
+}
+</script>
+
+{% endblock %}
